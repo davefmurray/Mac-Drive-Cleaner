@@ -583,13 +583,15 @@ static NSString *MDCFormatDate(NSDate *date) {
                                                    includingPropertiesForKeys:keys
                                                                       options:options
                                                                  errorHandler:^BOOL(NSURL * _Nonnull url, NSError * _Nonnull error) {
-        [warnings addObject:[NSString stringWithFormat:@"Could not inspect %@: %@", url.path, error.localizedDescription]];
+        if (![self shouldSilenceEnumerationError:error forURL:url scanReason:reasons]) {
+            [warnings addObject:[NSString stringWithFormat:@"Could not inspect %@: %@", url.path, error.localizedDescription]];
+        }
         return YES;
     }];
 
     for (NSURL *candidate in enumerator) {
         NSURL *standardized = candidate.standardizedURL;
-        if ([self shouldSkipURL:standardized excludedRoots:excludedRoots]) {
+        if ([self shouldSkipURL:standardized excludedRoots:excludedRoots scanReason:reasons]) {
             [enumerator skipDescendants];
             continue;
         }
@@ -632,7 +634,7 @@ static NSString *MDCFormatDate(NSDate *date) {
     }
 }
 
-- (BOOL)shouldSkipURL:(NSURL *)url excludedRoots:(NSArray<NSURL *> *)excludedRoots {
+- (BOOL)shouldSkipURL:(NSURL *)url excludedRoots:(NSArray<NSURL *> *)excludedRoots scanReason:(MDCReason)scanReason {
     NSString *path = url.path;
     for (NSURL *excludedRoot in excludedRoots) {
         NSString *excludedPath = excludedRoot.path;
@@ -640,6 +642,45 @@ static NSString *MDCFormatDate(NSDate *date) {
             return YES;
         }
     }
+
+    if ((scanReason & MDCReasonTemporary) != 0) {
+        NSString *lastPathComponent = url.lastPathComponent ?: @"";
+        if ([lastPathComponent isEqualToString:@"TemporaryItems"]) {
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
+- (BOOL)shouldSilenceEnumerationError:(NSError *)error forURL:(NSURL *)url scanReason:(MDCReason)scanReason {
+    if (error == nil) {
+        return NO;
+    }
+
+    if ((scanReason & MDCReasonTemporary) == 0) {
+        return NO;
+    }
+
+    NSString *path = url.path ?: @"";
+    NSString *lastPathComponent = url.lastPathComponent ?: @"";
+    BOOL isPermissionDenied = NO;
+
+    if ([error.domain isEqualToString:NSCocoaErrorDomain]) {
+        isPermissionDenied = (error.code == NSFileReadNoPermissionError);
+    } else if ([error.domain isEqualToString:NSPOSIXErrorDomain]) {
+        isPermissionDenied = (error.code == EACCES || error.code == EPERM);
+    }
+
+    if (isPermissionDenied) {
+        if ([lastPathComponent isEqualToString:@"TemporaryItems"]) {
+            return YES;
+        }
+        if ([path containsString:@"/T/com.apple."]) {
+            return YES;
+        }
+    }
+
     return NO;
 }
 
