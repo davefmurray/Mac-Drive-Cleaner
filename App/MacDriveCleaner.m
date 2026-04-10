@@ -162,6 +162,7 @@ static NSString *MDCFormatDate(NSDate *date) {
     self.allItems = [[NSMutableArray alloc] init];
     self.visibleItems = [[NSMutableArray alloc] init];
     self.warnings = [[NSMutableArray alloc] init];
+    [self buildMainMenu];
     [self buildUI];
     [self rescan:nil];
 }
@@ -313,6 +314,65 @@ static NSString *MDCFormatDate(NSDate *date) {
     ]];
 
     [self.window makeKeyAndOrderFront:nil];
+}
+
+- (void)buildMainMenu {
+    NSString *appName = @"Mac Drive Cleaner";
+
+    NSMenu *mainMenu = [[NSMenu alloc] initWithTitle:@""];
+
+    NSMenuItem *appMenuItem = [[NSMenuItem alloc] initWithTitle:appName action:nil keyEquivalent:@""];
+    [mainMenu addItem:appMenuItem];
+
+    NSMenu *appMenu = [[NSMenu alloc] initWithTitle:appName];
+    [appMenuItem setSubmenu:appMenu];
+
+    NSMenuItem *aboutItem = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"About %@", appName]
+                                                       action:@selector(orderFrontStandardAboutPanel:)
+                                                keyEquivalent:@""];
+    aboutItem.target = NSApp;
+    [appMenu addItem:aboutItem];
+    [appMenu addItem:[NSMenuItem separatorItem]];
+
+    NSMenuItem *hideItem = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"Hide %@", appName]
+                                                      action:@selector(hide:)
+                                               keyEquivalent:@"h"];
+    hideItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
+    hideItem.target = NSApp;
+    [appMenu addItem:hideItem];
+
+    NSMenuItem *hideOthersItem = [[NSMenuItem alloc] initWithTitle:@"Hide Others"
+                                                            action:@selector(hideOtherApplications:)
+                                                     keyEquivalent:@"h"];
+    hideOthersItem.keyEquivalentModifierMask = NSEventModifierFlagCommand | NSEventModifierFlagOption;
+    hideOthersItem.target = NSApp;
+    [appMenu addItem:hideOthersItem];
+
+    NSMenuItem *showAllItem = [[NSMenuItem alloc] initWithTitle:@"Show All"
+                                                         action:@selector(unhideAllApplications:)
+                                                  keyEquivalent:@""];
+    showAllItem.target = NSApp;
+    [appMenu addItem:showAllItem];
+    [appMenu addItem:[NSMenuItem separatorItem]];
+
+    NSMenuItem *quitItem = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"Quit %@", appName]
+                                                      action:@selector(terminate:)
+                                               keyEquivalent:@"q"];
+    quitItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
+    quitItem.target = NSApp;
+    [appMenu addItem:quitItem];
+
+    NSMenuItem *windowMenuItem = [[NSMenuItem alloc] initWithTitle:@"Window" action:nil keyEquivalent:@""];
+    [mainMenu addItem:windowMenuItem];
+    NSMenu *windowMenu = [[NSMenu alloc] initWithTitle:@"Window"];
+    [windowMenu addItemWithTitle:@"Minimize" action:@selector(performMiniaturize:) keyEquivalent:@"m"];
+    [windowMenu addItemWithTitle:@"Zoom" action:@selector(performZoom:) keyEquivalent:@""];
+    [windowMenu addItem:[NSMenuItem separatorItem]];
+    [windowMenu addItemWithTitle:@"Bring All to Front" action:@selector(arrangeInFront:) keyEquivalent:@""];
+    [windowMenuItem setSubmenu:windowMenu];
+
+    [NSApp setMainMenu:mainMenu];
+    [NSApp setWindowsMenu:windowMenu];
 }
 
 - (NSTextField *)labelWithString:(NSString *)string font:(NSFont *)font {
@@ -794,6 +854,13 @@ int main(int argc, const char * argv[]) {
         MDCAppDelegate *delegate = [[MDCAppDelegate alloc] init];
         app.delegate = delegate;
         [app setActivationPolicy:NSApplicationActivationPolicyRegular];
+        NSString *iconPath = [[NSBundle mainBundle] pathForResource:@"AppIcon" ofType:@"icns"];
+        if (iconPath.length > 0) {
+            NSImage *iconImage = [[NSImage alloc] initWithContentsOfFile:iconPath];
+            if (iconImage != nil) {
+                [app setApplicationIconImage:iconImage];
+            }
+        }
         [app activateIgnoringOtherApps:YES];
         [app run];
     }

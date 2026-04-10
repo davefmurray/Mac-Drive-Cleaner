@@ -16,6 +16,8 @@ Mac Drive Cleaner is a native macOS desktop app for finding temporary files and 
 ./scripts/build_app.sh
 ```
 
+The build regenerates the app icon and bundles it into the `.app` automatically.
+
 The build script creates:
 
 - `dist/Mac Drive Cleaner.app`
@@ -32,6 +34,11 @@ The build script creates:
 ```bash
 open "dist/Mac Drive Cleaner.app"
 ```
+
+## Shortcuts
+
+- `Cmd+H` hides the app
+- `Cmd+Q` quits the app
 
 ## Notes
 

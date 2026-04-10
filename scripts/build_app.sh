@@ -14,6 +14,8 @@ mkdir -p "$BUILD_DIR" "$DIST_DIR" "$MACOS_DIR" "$RESOURCES_DIR"
 rm -rf "$APP_BUNDLE"
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
 
+"$ROOT_DIR/scripts/build_icon.sh"
+
 clang \
   -fobjc-arc \
   -framework Cocoa \
@@ -21,6 +23,7 @@ clang \
   -o "$MACOS_DIR/MacDriveCleaner"
 
 cp "$ROOT_DIR/App/Info.plist" "$APP_BUNDLE/Contents/Info.plist"
+cp "$ROOT_DIR/App/Resources/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
 
 echo "Built app bundle:"
 echo "$APP_BUNDLE"
