@@ -1,0 +1,23 @@
+---
+title: "Project Memory"
+format: gfm
+---
+
+## Product Direction
+
+- Build a native macOS app with a straightforward desktop UI.
+- Focus on reviewing temporary files and large files, then moving them to Trash rather than deleting them permanently.
+- Keep the app practical and low-friction for everyday cleanup.
+
+## Repo Rules
+
+- Do not add any "made by codex", "built with codex", or similar AI attribution text anywhere in the product, repo, issues, pull requests, or release artifacts.
+- Use Dave F. Murray ownership and identity only.
+- When tagging or mentioning on GitHub, use `@davefmurray`.
+- Keep issue, PR, and bug language direct and product-focused.
+
+## Delivery Notes
+
+- Prefer shipping a usable `.app` bundle in `dist/`.
+- Prefer build scripts that work with the local macOS toolchain available in this repo.
+- Keep deletion reversible by sending files to Trash.
