@@ -172,6 +172,18 @@ static NSString *MDCFormatDate(NSDate *date) {
     return YES;
 }
 
+- (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)flag {
+    (void)sender;
+    if (!flag) {
+        [self.window makeKeyAndOrderFront:nil];
+    } else {
+        [self.window orderFront:nil];
+    }
+    [NSApp unhide:nil];
+    [NSApp activateIgnoringOtherApps:YES];
+    return YES;
+}
+
 - (void)buildUI {
     NSRect frame = NSMakeRect(0, 0, 1180, 780);
     self.window = [[NSWindow alloc] initWithContentRect:frame
