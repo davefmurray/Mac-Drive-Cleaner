@@ -9,12 +9,43 @@ format: gfm
 - Focus on reviewing temporary files and large files, then moving them to Trash rather than deleting them permanently.
 - Keep the app practical and low-friction for everyday cleanup.
 
+## Current Product Behavior
+
+- The app is a native AppKit macOS application, not a web wrapper.
+- The primary deliverable is a signed `.app` bundle at `dist/Mac Drive Cleaner.app`.
+- The packaged archive is `dist/Mac Drive Cleaner.zip`.
+- The app should surface temporary files and large files in one easy-to-scan table with simple bulk actions.
+- File removal must go through macOS Trash APIs so cleanup stays reversible.
+- The app menu should support standard macOS behavior including `Cmd+H` to hide and `Cmd+Q` to quit.
+- Clicking the app icon or Dock icon should restore the main window if the app is already running but hidden.
+
+## UI Notes
+
+- Keep the interface simple and desktop-native.
+- Favor direct labels and obvious actions over clever wording.
+- Avoid clutter, permanent-delete language, or anything that makes the app feel risky.
+- Preserve the bundled custom app icon in `App/Resources/AppIcon.icns`.
+
 ## Repo Rules
 
 - Do not add any "made by codex", "built with codex", or similar AI attribution text anywhere in the product, repo, issues, pull requests, or release artifacts.
 - Use Dave F. Murray ownership and identity only.
 - When tagging or mentioning on GitHub, use `@davefmurray`.
 - Keep issue, PR, and bug language direct and product-focused.
+
+## Build And Packaging
+
+- Build the app with `./scripts/build_app.sh`.
+- Build the distributable archive with `./scripts/package_app.sh`.
+- Keep the build pipeline compatible with the local macOS Objective-C/AppKit toolchain used by this repo.
+- Preserve bundle signing and extended-attribute cleanup in the build flow so the `.app` launches cleanly from Finder.
+
+## GitHub Workflow
+
+- Track meaningful product and packaging work in GitHub issues and PRs.
+- When making fixes, keep the local repo, merged `main`, and `dist/` artifacts in sync.
+- Comment on issues and PRs with direct validation notes when behavior is verified locally.
+- Keep all issue and PR language under the `@davefmurray` identity only.
 
 ## Delivery Notes
 
